@@ -2,13 +2,14 @@ package com.udacity.mybakingapp;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.AsyncTaskLoader;
 import android.support.v4.content.Loader;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -25,11 +26,23 @@ import java.net.URL;
  * Created by stefa on 05/05/2018.
  */
 
-public class MainFragment extends Fragment implements LoaderManager.LoaderCallbacks<Recipe[]> {
+public class MainFragment extends Fragment
+        implements LoaderManager.LoaderCallbacks<Recipe[]>,
+                    RecipesAdapter.RecipeAdapterClickHandler {
+
+
     private static int ID_LOADER_RECIPES=100;
     Context mContext;
     Recipe[] mRecipesData;
     RecyclerView mRecyclerView;
+
+    @Override
+    public void onClick(View v,int recipeIndex) {
+        Intent intent = new Intent(mContext,RecipeDetailActivity.class);
+        intent.putExtra("RECIPE_ID",recipeIndex);
+        intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        startActivity(intent);
+    }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -43,15 +56,20 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
-        View rootView=inflater.inflate(R.layout.main_fragment,container,false);
+        View rootView=inflater.inflate(R.layout.fragment_main,container,false);
         LoaderManager lm = getLoaderManager();
         lm.initLoader(ID_LOADER_RECIPES,null,this);
 
         mRecyclerView = rootView.findViewById(R.id.rv_recipes_main);
-        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(mContext,LinearLayoutManager.VERTICAL,false);
+        RecyclerView.LayoutManager layoutManager;
+        if (getResources().getBoolean(R.bool.isTablet))
+            layoutManager = new GridLayoutManager(mContext,2);
+        else
+            layoutManager = new LinearLayoutManager(mContext,LinearLayoutManager.VERTICAL,false);
+
         mRecyclerView.setLayoutManager(layoutManager);
         mRecyclerView.setHasFixedSize(true);
-        RecipesAdapter ra=new RecipesAdapter();
+        RecipesAdapter ra=new RecipesAdapter(this);
         mRecyclerView.setAdapter(ra);
 
         return rootView;
@@ -87,7 +105,7 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
     @Override
     public void onLoadFinished(Loader<Recipe[]> loader, Recipe[] data) {
        mRecipesData=data;
-       RecipesAdapter ra=new RecipesAdapter();
+       RecipesAdapter ra=new RecipesAdapter(this);
        ra.setRecipesData(mRecipesData);
        mRecyclerView.setAdapter(ra);
 

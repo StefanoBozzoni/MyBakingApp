@@ -103,7 +103,6 @@ public class MyRecyclerView extends RecyclerView {
         }
     }
 
-
     @Override
     public void setAdapter(Adapter adapter) {
         super.setAdapter(adapter);

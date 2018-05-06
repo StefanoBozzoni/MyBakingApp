@@ -1,0 +1,62 @@
+<ScrollView
+    android:id="@+id/recipe_detail_scrollView"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        tools:context="com.udacity.mybakingapp.RecipeDetailFragment"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/lbl_ingredients"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Ingredients"
+            android:textAlignment="center"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            tools:text="Ingredients" />
+
+        <TextView
+            android:id="@+id/tv_ingredients_descr"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="18sp"
+            android:layout_below="@id/lbl_ingredients"
+            />
+        <!--
+        <ListView
+            android:id="@+id/lv_Ingredients"
+            android:layout_width="wrap_content"
+            tools:listitem="@layout/recipe_ingredients"
+            android:fadeScrollbars="false"
+            android:layout_height="wrap_content">
+        </ListView>
+        -->
+
+        <TextView
+            android:id="@+id/lbl_steps"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Recipe Steps"
+            android:textAlignment="center"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            tools:text="Recipe Steps"
+            android:layout_below="@+id/tv_ingredients_descr"/>
+
+        <ListView
+            android:id="@+id/lv_Steps"
+            android:layout_width="match_parent"
+            android:layout_height="500dp"
+            android:fadeScrollbars="false"
+            android:layout_below="@+id/lbl_steps"
+            tools:listitem="@layout/recipe_steps">
+
+        </ListView>
+
+    </RelativeLayout>
+</ScrollView>

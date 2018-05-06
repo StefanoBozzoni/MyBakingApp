@@ -29,6 +29,7 @@ import java.util.Scanner;
 
 public class JsonUtils {
     private static final String TAG = "JSonUtils";
+    private static Recipe[] mRecipes= null;
 
     /**
      * This method returns the entire result from the HTTP response.
@@ -105,6 +106,12 @@ public class JsonUtils {
         return url;
     }
 
+    public static Recipe getRecipe(int index) {
+        if ((mRecipes!=null) && (index <= mRecipes.length))
+            return mRecipes[index];
+        else
+            return null;
+    }
 
     public static Recipe[] parseRecipesJson(String json) {
         try {
@@ -120,6 +127,7 @@ public class JsonUtils {
                 recipe = gson.fromJson(recipeString, Recipe.class);  // Convert JSON to Java Object
                 recipes[i]=recipe;
             }
+            mRecipes=recipes;
             return recipes;
         }
         catch (JSONException e) {

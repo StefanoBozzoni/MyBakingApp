@@ -43,4 +43,9 @@ public class Ingredient {
         this.ingredient = ingredient;
     }
 
+    public Ingredient(double quantity, String measure, String ingredient) {
+        this.quantity   = quantity;
+        this.measure    = measure;
+        this.ingredient = ingredient;
+    }
 }

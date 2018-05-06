@@ -13,7 +13,7 @@ import com.udacity.mybakingapp.R;
 import com.udacity.mybakingapp.model.MovieItem;
 import com.udacity.mybakingapp.utils.JsonUtils;
 
-public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.PMViewHolder> {
+public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.PMViewHolder>  {
 
     private MovieItem[] moviesData;
     private Context rcContext;
@@ -47,7 +47,7 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.PMViewHold
             int adapterPosition = getAdapterPosition();
             MovieItem thisMovie = moviesData[adapterPosition];
             //ImageView iv = (ImageView) v.findViewById(R.id.imageView_pm);
-            mClickHandler.onClick(v,thisMovie);
+             mClickHandler.onClick(v,thisMovie);
         }
 
 

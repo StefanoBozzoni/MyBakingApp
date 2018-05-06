@@ -22,8 +22,18 @@ import com.udacity.mybakingapp.utils.JsonUtils;
 
 public class RecipesAdapter extends RecyclerView.Adapter<RecipesAdapter.ViewHolder> {
 
+    public interface RecipeAdapterClickHandler {
+        void onClick(View v, int idx);
+    }
+
     private Recipe[] mRecipesData;
     private Context rcContext;
+    private RecipeAdapterClickHandler mClickHandler;
+
+    public RecipesAdapter(RecipeAdapterClickHandler clickHandler) {
+        mClickHandler=clickHandler;
+    }
+
 
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
@@ -34,21 +44,15 @@ public class RecipesAdapter extends RecyclerView.Adapter<RecipesAdapter.ViewHold
             super(view);
             name_tv      =  view.findViewById(R.id.tv_recipe);
             imgThumbnail =  view.findViewById(R.id.img_recipe);
-            //view.setOnClickListener(this);
+            view.setOnClickListener(this);
         }
-
 
         @Override
         public void onClick(View v) {
-            int position = getAdapterPosition();
-            /*
-            String url = "https://www.youtube.com/watch?v=".concat(mRecipesData[position].getKey());
-            Intent i = new Intent(Intent.ACTION_VIEW);
-            i.setData(Uri.parse(url));
-            ActivityCompat.startActivity(v.getContext(),i,null);
-            */
+            int mIndexPosition = getAdapterPosition();
+            int recipeID=mRecipesData[mIndexPosition].getId();
+            mClickHandler.onClick(v,recipeID);
         }
-
     }
 
     @Override
