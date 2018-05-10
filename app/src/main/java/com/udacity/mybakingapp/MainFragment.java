@@ -39,7 +39,7 @@ public class MainFragment extends Fragment
     @Override
     public void onClick(View v,int recipeIndex) {
         Intent intent = new Intent(mContext,RecipeDetailActivity.class);
-        intent.putExtra("RECIPE_ID",recipeIndex);
+        intent.putExtra("RECIPE_ID",recipeIndex-1);
         intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
         startActivity(intent);
     }

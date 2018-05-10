@@ -7,6 +7,7 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.google.android.exoplayer2.DefaultLoadControl;
 import com.google.android.exoplayer2.DefaultRenderersFactory;
@@ -17,7 +18,10 @@ import com.google.android.exoplayer2.source.MediaSource;
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
 import com.google.android.exoplayer2.ui.PlayerView;
 import com.google.android.exoplayer2.upstream.DefaultHttpDataSourceFactory;
+import com.google.android.exoplayer2.util.Util;
 import com.udacity.mybakingapp.utils.JsonUtils;
+
+import org.w3c.dom.Text;
 
 
 /**
@@ -36,12 +40,20 @@ public class StepDetailFragment extends Fragment {
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
+    private static final String SELECTED_POSITION="PLAYER_POSITION";
+    private static final String RECIPE_ID="RECIPE_ID";
+    private static final String STEP_ID="STEP_ID";
 
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
+    int mStepId=0;
+    private int mRecipeId=-1;
+    private long mStartPosition;
 
     private OnFragmentInteractionListener mListener;
+    private View mRootView;
+
 
     public StepDetailFragment() {
         // Required empty public constructor
@@ -68,8 +80,9 @@ public class StepDetailFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         mContext=getContext();
+        //mStepId=-1;
+        //mRecipeId=-1;
 
         if (getArguments() != null) {
             mParam1 = getArguments().getString(ARG_PARAM1);
@@ -80,19 +93,25 @@ public class StepDetailFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        mStartPosition=0;
+        if (savedInstanceState!=null) {
+            mStartPosition = savedInstanceState.getLong(SELECTED_POSITION);
+            mRecipeId      = savedInstanceState.getInt(RECIPE_ID);
+            mStepId        = savedInstanceState.getInt(STEP_ID);
+        }
+
         // Inflate the layout for this fragment
         View rootView= inflater.inflate(R.layout.fragment_step_detail, container, false);
+        mRootView =rootView;
         mPlayerView= (PlayerView) rootView.findViewById(R.id.exoplayer);
-        initializePlayer();
+        //initializePlayer()
+        if (mRecipeId!=-1) {
+            String step_description = JsonUtils.getRecipe(mRecipeId).getSteps().get(mStepId).getDescription();
+            TextView tv_step_descr = (TextView) mRootView.findViewById(R.id.tv_step_description);
+            tv_step_descr.setText(step_description);
+        }
         return rootView;
 
-    }
-
-    // TODO: Rename method, update argument and hook method into UI event
-    public void onButtonPressed(Uri uri) {
-        if (mListener != null) {
-            mListener.onFragmentInteraction(uri);
-        }
     }
 
     @Override
@@ -117,19 +136,37 @@ public class StepDetailFragment extends Fragment {
                 new DefaultHttpDataSourceFactory("exoplayer-codelab")).
                 createMediaSource(uri);
     }
-    private void initializePlayer() {
-        SimpleExoPlayer player = ExoPlayerFactory.newSimpleInstance(
-                new DefaultRenderersFactory(mContext),
-                new DefaultTrackSelector(), new DefaultLoadControl());
 
-        mPlayerView.setPlayer(player);
-        player.setPlayWhenReady(true);
-        player.seekTo(0, 0);
-        //initialize data source
-        String videoUrl=JsonUtils.getRecipe(0).getSteps().get(0).getVideoURL();
-        Uri uri = Uri.parse(videoUrl);
-        MediaSource mediaSource = buildMediaSource(uri);
-        player.prepare(mediaSource, true, false);
+    private void initializePlayer() {
+        if (mRecipeId!=-1) {
+            String videoUrl = JsonUtils.getRecipe(mRecipeId).getSteps().get(mStepId).getVideoURL();
+            if (!videoUrl.isEmpty()) {
+                mRootView.findViewById(R.id.tv_NovVideoAvailable).setVisibility(View.GONE);
+                SimpleExoPlayer player = ExoPlayerFactory.newSimpleInstance(
+                        new DefaultRenderersFactory(mContext),
+                        new DefaultTrackSelector(), new DefaultLoadControl());
+                mPlayerView.setPlayer(player);
+                player.setPlayWhenReady(true);
+                player.seekTo(player.getCurrentWindowIndex(), mStartPosition);
+                Uri uri;
+                uri = Uri.parse(videoUrl);
+                MediaSource mediaSource = buildMediaSource(uri);
+                boolean resetPosition=true;
+                if (mStartPosition!=0) resetPosition=false;
+                player.prepare(mediaSource, resetPosition, false);
+
+            }
+            else
+            {
+                mRootView.findViewById(R.id.exoplayer).setVisibility(View.GONE);
+                mRootView.findViewById(R.id.tv_NovVideoAvailable).setVisibility(View.VISIBLE);
+            }
+        }
+    }
+
+    public void setStepId(int recipeId,int stepId) {
+        mStepId=stepId;
+        mRecipeId=recipeId;
     }
 
     /**
@@ -145,5 +182,64 @@ public class StepDetailFragment extends Fragment {
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        if (Util.SDK_INT <= 23) {
+            releasePlayer();
+        }
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        if (Util.SDK_INT > 23) {
+            releasePlayer();
+        }
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        /*
+        if (Util.SDK_INT > 23) {
+            initializePlayer();
+        }
+        */
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        SimpleExoPlayer player= (SimpleExoPlayer) mPlayerView.getPlayer();
+
+        if ((Util.SDK_INT <= 23) || (player==null)) {
+            initializePlayer();
+        }
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle currentState) {
+        SimpleExoPlayer player= (SimpleExoPlayer) mPlayerView.getPlayer();
+        long position=player.getCurrentPosition();
+        currentState.putLong(SELECTED_POSITION, position);
+        currentState.putLong(RECIPE_ID, mRecipeId);
+        currentState.putLong(STEP_ID, mStepId);
+
+        super.onSaveInstanceState(currentState);
+    }
+
+    private void releasePlayer() {
+        SimpleExoPlayer player= (SimpleExoPlayer) mPlayerView.getPlayer();
+        if (mPlayerView.getPlayer() != null) {
+            //playbackPosition = player.getCurrentPosition();
+            //currentWindow = player.getCurrentWindowIndex();
+            //playWhenReady = player.getPlayWhenReady();
+            player.release();
+            player = null;
+        }
     }
 }

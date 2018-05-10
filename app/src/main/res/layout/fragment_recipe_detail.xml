@@ -53,9 +53,10 @@
             android:layout_width="match_parent"
             android:layout_height="500dp"
             android:fadeScrollbars="false"
+            android:choiceMode="singleChoice"
+            android:listSelector="@color/colorAccent"
             android:layout_below="@+id/lbl_steps"
             tools:listitem="@layout/recipe_steps">
-
         </ListView>
 
     </RelativeLayout>

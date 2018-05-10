@@ -102,26 +102,19 @@ public class RecipeDetailFragment extends Fragment {
         ButterKnife.bind(this,mRootView);
 
         //mListIngredients = (ListView) rootView.findViewById(R.id.lv_Ingredients);
-        mListSteps       = (ListView) mRootView.findViewById(R.id.lv_Steps);
-        mIngredients_tv  =(TextView) mRootView.findViewById(R.id.tv_ingredients_descr);
-        mScrollView      =  (ScrollView) mRootView.findViewById(R.id.recipe_detail_scrollView);
-
+        mListSteps       = (ListView)   mRootView.findViewById(R.id.lv_Steps);
+        mIngredients_tv  = (TextView)   mRootView.findViewById(R.id.tv_ingredients_descr);
+        mScrollView      = (ScrollView) mRootView.findViewById(R.id.recipe_detail_scrollView);
 
         return mRootView;
     }
 
-    // TODO: Rename method, update argument and hook method into UI event
-    public void onButtonPressed(Uri uri) {
-        if (mListener != null) {
-            mListener.onFragmentInteraction(uri);
-        }
-    }
 
     @OnItemClick(R.id.lv_Steps)
     public void onItemClick(int position) {
-        Intent intent = new Intent(mContext, StepDetailActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
-        startActivity(intent);
+        if (mListener!=null)
+            mListener.onItemListSelected(position);
+
     }
 
     @Override
@@ -160,8 +153,7 @@ public class RecipeDetailFragment extends Fragment {
      * >Communicating with Other Fragments</a> for more information.
      */
     public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
-        void onFragmentInteraction(Uri uri);
+        void onItemListSelected(int position);
     }
 
     public void RefreshLists() {
@@ -250,7 +242,7 @@ public class RecipeDetailFragment extends Fragment {
 
     public void setRecipeID(int ID) {
         mRecipeId = ID;
-        mRecipe   = JsonUtils.getRecipe(mRecipeId-1);
+        mRecipe   = JsonUtils.getRecipe(mRecipeId);
         RefreshLists();
     }
 

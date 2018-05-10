@@ -22,9 +22,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity
-            android:name=".MovieDetailActivity"
-            android:parentActivityName=".MainActivity" />
 
         <provider
             android:name=".data.FavoritesProvider"
