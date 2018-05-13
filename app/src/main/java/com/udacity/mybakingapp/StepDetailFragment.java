@@ -1,13 +1,17 @@
 package com.udacity.mybakingapp;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.exoplayer2.DefaultLoadControl;
 import com.google.android.exoplayer2.DefaultRenderersFactory;
@@ -19,6 +23,7 @@ import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
 import com.google.android.exoplayer2.ui.PlayerView;
 import com.google.android.exoplayer2.upstream.DefaultHttpDataSourceFactory;
 import com.google.android.exoplayer2.util.Util;
+import com.udacity.mybakingapp.model.Step;
 import com.udacity.mybakingapp.utils.JsonUtils;
 
 import org.w3c.dom.Text;
@@ -36,17 +41,12 @@ public class StepDetailFragment extends Fragment {
 
     private Context mContext;
     private PlayerView mPlayerView;
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
+
     private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
     private static final String SELECTED_POSITION="PLAYER_POSITION";
     private static final String RECIPE_ID="RECIPE_ID";
     private static final String STEP_ID="STEP_ID";
 
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
     int mStepId=0;
     private int mRecipeId=-1;
     private long mStartPosition;
@@ -63,16 +63,13 @@ public class StepDetailFragment extends Fragment {
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
      *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
+     * @param recipeId id recipe.
      * @return A new instance of fragment StepFragment.
      */
-    // TODO: Rename and change types and number of parameters
-    public static StepDetailFragment newInstance(String param1, String param2) {
+    public static StepDetailFragment newInstance(int recipeId) {
         StepDetailFragment fragment = new StepDetailFragment();
         Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
+        args.putInt(ARG_PARAM1, recipeId);
         fragment.setArguments(args);
         return fragment;
     }
@@ -81,17 +78,16 @@ public class StepDetailFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mContext=getContext();
-        //mStepId=-1;
-        //mRecipeId=-1;
 
         if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
+            mRecipeId = getArguments().getInt(ARG_PARAM1);
         }
+        //setRetainInstance(true);
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(LayoutInflater inflater,
+                             ViewGroup container,
                              Bundle savedInstanceState) {
         mStartPosition=0;
         if (savedInstanceState!=null) {
@@ -100,17 +96,37 @@ public class StepDetailFragment extends Fragment {
             mStepId        = savedInstanceState.getInt(STEP_ID);
         }
 
-        // Inflate the layout for this fragment
-        View rootView= inflater.inflate(R.layout.fragment_step_detail, container, false);
+        View rootView;
+        if ((getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE)
+           || getResources().getBoolean(R.bool.isTablet))
+            // Inflate the layout for this fragment
+            rootView= inflater.inflate(R.layout.fragment_step_detail_land, container, false);
+        else
+            rootView= inflater.inflate(R.layout.fragment_step_detail, container, false);
+
         mRootView =rootView;
         mPlayerView= (PlayerView) rootView.findViewById(R.id.exoplayer);
         //initializePlayer()
-        if (mRecipeId!=-1) {
-            String step_description = JsonUtils.getRecipe(mRecipeId).getSteps().get(mStepId).getDescription();
-            TextView tv_step_descr = (TextView) mRootView.findViewById(R.id.tv_step_description);
-            tv_step_descr.setText(step_description);
-        }
         return rootView;
+
+    }
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        if (mRecipeId!=-1) {
+            Step currStep = JsonUtils.getRecipe(mRecipeId).getSteps().get(mStepId);
+            String step_description = currStep.getDescription();
+            String step_title="";
+            if (mStepId==0)
+                step_title = currStep.getShortDescription();
+            else
+                step_title = Integer.toString(mStepId)+". "+currStep.getShortDescription();
+            TextView tv_step_descr  = (TextView) mRootView.findViewById(R.id.tv_step_description);
+            TextView tv_step_title  = (TextView) mRootView.findViewById(R.id.tv_step_title);
+            tv_step_descr.setText(step_description);
+            tv_step_title.setText(step_title);
+        }
 
     }
 
@@ -137,8 +153,35 @@ public class StepDetailFragment extends Fragment {
                 createMediaSource(uri);
     }
 
+
+    @SuppressLint("InlinedApi")
+    private void hideSystemUi() {
+
+        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+            mRootView.findViewById(R.id.tv_step_description).setVisibility(View.GONE);
+
+            mPlayerView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LOW_PROFILE
+                        | View.SYSTEM_UI_FLAG_FULLSCREEN
+                        | View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                        | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+                        | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                        | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
+
+        }
+    }
+
+
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        Toast.makeText(mContext, "prova conf", Toast.LENGTH_SHORT).show();
+    }
+
+
+
     private void initializePlayer() {
-        if (mRecipeId!=-1) {
+        if ((mRecipeId!=-1) && (mStepId>=0)) {
             String videoUrl = JsonUtils.getRecipe(mRecipeId).getSteps().get(mStepId).getVideoURL();
             if (!videoUrl.isEmpty()) {
                 mRootView.findViewById(R.id.tv_NovVideoAvailable).setVisibility(View.GONE);
@@ -203,11 +246,12 @@ public class StepDetailFragment extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
-        /*
-        if (Util.SDK_INT > 23) {
+        SimpleExoPlayer player= (SimpleExoPlayer) mPlayerView.getPlayer();
+
+        if ((Util.SDK_INT > 23) || (player==null)) {
             initializePlayer();
         }
-        */
+
     }
 
     @Override
@@ -219,12 +263,17 @@ public class StepDetailFragment extends Fragment {
         if ((Util.SDK_INT <= 23) || (player==null)) {
             initializePlayer();
         }
+
+        hideSystemUi();
+        //ExoPlayerActivity.this.getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_FULLSCREEN || View.SYSTEM_UI_FLAG_IMMERSIVE)
     }
 
     @Override
     public void onSaveInstanceState(Bundle currentState) {
         SimpleExoPlayer player= (SimpleExoPlayer) mPlayerView.getPlayer();
-        long position=player.getCurrentPosition();
+        long position=0;
+        if (player!=null)
+            position=player.getCurrentPosition();
         currentState.putLong(SELECTED_POSITION, position);
         currentState.putLong(RECIPE_ID, mRecipeId);
         currentState.putLong(STEP_ID, mStepId);
@@ -234,7 +283,7 @@ public class StepDetailFragment extends Fragment {
 
     private void releasePlayer() {
         SimpleExoPlayer player= (SimpleExoPlayer) mPlayerView.getPlayer();
-        if (mPlayerView.getPlayer() != null) {
+        if (player != null) {
             //playbackPosition = player.getCurrentPosition();
             //currentWindow = player.getCurrentWindowIndex();
             //playWhenReady = player.getPlayWhenReady();

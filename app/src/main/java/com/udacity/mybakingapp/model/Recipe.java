@@ -3,6 +3,8 @@ package com.udacity.mybakingapp.model;
 /**
  * Created by stefa on 05/05/2018.
  */
+import android.graphics.Bitmap;
+
 import java.util.ArrayList;
 import java.util.List;
 import com.google.gson.annotations.Expose;
@@ -27,6 +29,8 @@ public class Recipe {
     @SerializedName("image")
     @Expose
     private String image;
+
+    private Bitmap thumbnail;
 
     public Integer getId() {
         return id;
@@ -75,4 +79,11 @@ public class Recipe {
     public void setImage(String image) {
         this.image = image;
     }
+
+    public void setThumbnail(Bitmap bmp) {
+        this.thumbnail = bmp;
+    }
+
+    public Bitmap getThumbnail() { return this.thumbnail; }
+
 }

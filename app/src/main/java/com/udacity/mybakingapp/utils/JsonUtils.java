@@ -1,11 +1,18 @@
 package com.udacity.mybakingapp.utils;
 
+import android.content.Context;
+import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.media.MediaMetadataRetriever;
+import android.media.ThumbnailUtils;
 import android.net.Uri;
+import android.os.Build;
+import android.provider.MediaStore;
 import android.util.Log;
 
 import com.google.gson.Gson;
 import com.udacity.mybakingapp.BuildConfig;
-import com.udacity.mybakingapp.model.MovieItem;
+import com.udacity.mybakingapp.data.ImageReplacer;
 import com.udacity.mybakingapp.model.Recipe;
 import com.udacity.mybakingapp.model.ReviewItem;
 import com.udacity.mybakingapp.model.TrailerItem;
@@ -23,6 +30,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Scanner;
@@ -127,9 +135,23 @@ public class JsonUtils {
                 recipe = gson.fromJson(recipeString, Recipe.class);  // Convert JSON to Java Object
                 recipes[i]=recipe;
             }
+            ImageReplacer ir=new ImageReplacer();
+            for (Recipe recipe:recipes) {
+                int numSteps=recipe.getSteps().size();
+                String videoUrl=recipe.getSteps().get(numSteps-1).getVideoURL();
+                Bitmap thumbnail=null;
+                String altImageUrlStr=ir.findThumbnailByRecipeId(recipe.getId());
+                if (altImageUrlStr==null) altImageUrlStr="";
+                if (altImageUrlStr.isEmpty() && (recipe.getImage().isEmpty()) && (!videoUrl.isEmpty()))
+                    thumbnail = retriveVideoFrameFromVideo(videoUrl);
+                recipe.setThumbnail(thumbnail);
+            }
+
             mRecipes=recipes;
             return recipes;
         }
+
+
         catch (JSONException e) {
             e.printStackTrace();
             //Log.d(TAG,"Couldn't parse Json Movies Object:"+json);
@@ -137,119 +159,7 @@ public class JsonUtils {
         }
     }
 
-    public static MovieItem parseSingleMovieJsonObject(JSONObject aMovieItem)  {
-        try {
-            MovieItem movie;// = new MovieItem();
-            int id = getJsonInt(aMovieItem, MovieItem.id_Json);
-            int vote_count = getJsonInt(aMovieItem, MovieItem.vote_count_Json);
-            float vote_average = getJsonFloat(aMovieItem, MovieItem.vote_average_Json);
-            boolean video = getJsonBoolean(aMovieItem, MovieItem.video_Json);
-            int popularity = getJsonInt(aMovieItem, MovieItem.popularity_Json);
-            String poster_path = getJsonString(aMovieItem, MovieItem.poster_path_Json);
-            String original_language = getJsonString(aMovieItem, MovieItem.original_language_Json);
-            String original_title = getJsonString(aMovieItem, MovieItem.original_title_Json);
-            //not necessary: List<Integer> genre_ids   = getJsonIntegerList(aMovieItem ,MovieItem.genre_ids_Json);
-            String backdrop_path = getJsonString(aMovieItem, MovieItem.backdrop_path_Json);
-            boolean adult = getJsonBoolean(aMovieItem, MovieItem.adult_Json);
-            String overview = getJsonString(aMovieItem, MovieItem.overview_Json);
-            Date release_date = getJsonDate(aMovieItem, MovieItem.release_date_Json);
-            movie = new MovieItem(id, vote_count, vote_average, video, popularity, poster_path, original_language, original_title, null,
-                    backdrop_path, adult, overview, release_date);
-            return movie;
-        }
-        catch (JSONException e) {
-                Log.d(TAG,"Couldn't parse Json Movies Object:"+aMovieItem.toString());
-                e.printStackTrace();
-                return null;
-        }
-    }
 
-    public static MovieItem parseSingleMovieJson(String json) {
-        try {
-            JSONObject aMovieItem        = new JSONObject(json);
-            return parseSingleMovieJsonObject(aMovieItem);
-        }
-        catch (JSONException e) {
-            Log.d(TAG,"Couldn't parse Json Movies Object:"+json);
-            return null;
-        }
-    }
-
-
-    public static MovieItem[] parseMoviesJson(String json) {
-        try {
-            JSONObject myJson        = new JSONObject(json);
-            JSONArray arrayJsonRoot  = myJson.getJSONArray("results");
-            int num_movies=arrayJsonRoot.length();
-
-            MovieItem[] movies = new MovieItem[num_movies];
-            for (int i=0;i<num_movies;i++) {
-                JSONObject aMovieItem     = arrayJsonRoot.getJSONObject(i);
-                movies[i] = parseSingleMovieJsonObject(aMovieItem);
-            }
-            return movies;
-        }
-        catch (JSONException e) {
-            Log.d(TAG,"Couldn't parse Json Movies Object:"+json);
-            //e.printStackTrace();
-            return null;
-        }
-    }
-
-
-    public static ReviewItem[] parseReviewsJson(String json) {
-        try {
-            JSONObject myJson        = new JSONObject(json);
-            JSONArray arrayJsonRoot  = myJson.getJSONArray("results");
-            int num_records=arrayJsonRoot.length();
-
-            ReviewItem[] reviews = new ReviewItem[num_records];
-            for (int i=0;i<num_records;i++) {
-                JSONObject aReviewItem    = arrayJsonRoot.getJSONObject(i);
-                String id                 = getJsonString(aReviewItem  ,ReviewItem.id_Json);
-                String author             = getJsonString(aReviewItem  ,ReviewItem.author_Json);
-                String content            = getJsonString(aReviewItem  ,ReviewItem.content_Json);
-                String url                = getJsonString(aReviewItem  ,ReviewItem.url_Json);
-                reviews[i] = new ReviewItem(id,author,content,url);
-            }
-            return reviews;
-        }
-        catch (JSONException e) {
-            Log.d(TAG,"Couldn't parse Json Reviews Object:"+json);
-            //e.printStackTrace();
-            return null;
-        }
-    }
-
-    public static TrailerItem[] parseTrailersJson(String json) {
-        try {
-
-            JSONObject myJson        = new JSONObject(json);
-            JSONArray arrayJsonRoot  = myJson.getJSONArray("results");
-            int num_records=arrayJsonRoot.length();
-
-            TrailerItem[] trailers = new TrailerItem[num_records];
-            for (int i=0;i<num_records;i++) {
-                JSONObject aTrailerItem     = arrayJsonRoot.getJSONObject(i);
-                String id              = getJsonString(aTrailerItem  ,TrailerItem.id_Json);
-                String iso6391         = getJsonString(aTrailerItem  ,TrailerItem.iso6391_Json);
-                String iso31661        = getJsonString(aTrailerItem  ,TrailerItem.iso31661_Json);
-                String key             = getJsonString(aTrailerItem  ,TrailerItem.key_Json);
-                String name            = getJsonString(aTrailerItem  ,TrailerItem.name_Json);
-                String site            = getJsonString(aTrailerItem  ,TrailerItem.site_Json);
-                int    size            = getJsonInt(aTrailerItem     ,TrailerItem.size_Json);
-                String type            = getJsonString(aTrailerItem  ,TrailerItem.type_Json);
-
-                trailers[i] = new TrailerItem(id,iso6391,iso31661,key,name,site,size,type);
-            }
-            return trailers;
-        }
-        catch (JSONException e) {
-            Log.d(TAG,"Couldn't parse Json Reviews Object:"+json);
-            //e.printStackTrace();
-            return null;
-        }
-    }
 
 
     public static String getJsonString(JSONObject pJson,String propertyName) throws JSONException  {
@@ -292,7 +202,61 @@ public class JsonUtils {
         return release_date;
     }
 
-    public static String makeThumbnailURL(String key) {
-        return YOUTUBE_TN_URL.concat(key).concat("/hqdefault.jpg");
+    public static Bitmap makeThumbnailURL(String path) {
+        //return YOUTUBE_TN_URL.concat(key).concat("/hqdefault.jpg");
+        Bitmap thumb = ThumbnailUtils.createVideoThumbnail(path, MediaStore.Images.Thumbnails.MINI_KIND);
+        return thumb;
     }
+
+    public static Bitmap retriveVideoFrameFromVideo(String videoPath)
+    {
+
+       // Bitmap bitmap = null;
+       // ThumbnailUtils.createVideoThumbnail(Uri.parse(videoPath).getEncodedPath(),
+       //         MediaStore.Images.Thumbnails.MINI_KIND);
+       // return bitmap;
+
+
+        Bitmap bitmap = null;
+        MediaMetadataRetriever mediaMetadataRetriever = null;
+        try
+        {
+            mediaMetadataRetriever = new MediaMetadataRetriever();
+            if (Build.VERSION.SDK_INT >= 14)
+                mediaMetadataRetriever.setDataSource(videoPath, new HashMap<String, String>());
+            else
+                mediaMetadataRetriever.setDataSource(videoPath);
+
+            bitmap = mediaMetadataRetriever.getFrameAtTime(0,MediaMetadataRetriever.OPTION_CLOSEST);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException();//Throwable("Exception in retriveVideoFrameFromVideo(String videoPath)" + e.getMessage());
+        } finally {
+            if (mediaMetadataRetriever != null) {
+                mediaMetadataRetriever.release();
+            }
+        }
+        //bitmap=Bitmap.createScaledBitmap(bitmap, 1500, 500, false);
+        return bitmap;
+    }
+
+    public static Bitmap getRunTimeThumbnail(Context context, String videoUrl) {
+        String selectedPathVideo = ImageFilePath.getPath(context, Uri.parse(videoUrl));
+        Log.i("Image File Path", "" + selectedPathVideo);
+        Bitmap thumb = ThumbnailUtils.createVideoThumbnail(selectedPathVideo, MediaStore.Video.Thumbnails.MICRO_KIND);
+        return thumb;
+    }
+
+
+    /*
+    public static String getPath(Uri uri) {
+        String[] projection = { MediaStore.Images.Media.DATA };
+        Cursor cursor = getApplicationContext().managedQuery(uri, projection, null, null, null);
+        int column_index = cursor
+                .getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+        cursor.moveToFirst();
+        return cursor.getString(column_index);
+    }
+    */
+
 }

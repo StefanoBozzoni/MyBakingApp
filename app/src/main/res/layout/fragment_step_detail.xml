@@ -41,6 +41,19 @@
         app:layout_constraintGuide_percent="0.50" />
 
     <TextView
+        android:id="@+id/tv_step_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:background="@color/card_background"
+        android:gravity="center"
+        android:textColor="@color/color_black"
+        android:textSize="@dimen/dimen24sp"
+        android:textStyle="bold"
+        app:layout_constraintTop_toTopOf="@+id/guideline"
+        tools:text="tv_step_title" />
+
+    <TextView
         android:id="@+id/tv_step_description"
         android:layout_width="0dp"
         android:layout_height="227dp"
@@ -51,6 +64,6 @@
         android:textSize="24sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/guideline" />
+        app:layout_constraintTop_toBottomOf="@+id/tv_step_title" />
 
 </android.support.constraint.ConstraintLayout>

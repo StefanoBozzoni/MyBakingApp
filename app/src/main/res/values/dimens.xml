@@ -24,4 +24,6 @@
     <dimen name="thumbnail_width">120dp</dimen>
     <dimen name="progrBar_width">42dp</dimen>
     <dimen name="progrBar_height">42dp</dimen>
+    <dimen name="margin13dp">13dp</dimen>
+    <dimen name="dimen24sp">24sp</dimen>
 </resources>

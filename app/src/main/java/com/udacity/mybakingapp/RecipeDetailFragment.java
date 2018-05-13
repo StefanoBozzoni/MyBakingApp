@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -59,6 +60,7 @@ public class RecipeDetailFragment extends Fragment {
 
     private OnFragmentInteractionListener mListener;
     private TextView mIngredients_tv;
+    private TextView mTitle_tv;
 
     public RecipeDetailFragment() {
         // Required empty public constructor
@@ -104,6 +106,8 @@ public class RecipeDetailFragment extends Fragment {
         //mListIngredients = (ListView) rootView.findViewById(R.id.lv_Ingredients);
         mListSteps       = (ListView)   mRootView.findViewById(R.id.lv_Steps);
         mIngredients_tv  = (TextView)   mRootView.findViewById(R.id.tv_ingredients_descr);
+        mTitle_tv        = (TextView)   mRootView.findViewById(R.id.tv_recipe_title);
+
         mScrollView      = (ScrollView) mRootView.findViewById(R.id.recipe_detail_scrollView);
 
         return mRootView;
@@ -111,10 +115,10 @@ public class RecipeDetailFragment extends Fragment {
 
 
     @OnItemClick(R.id.lv_Steps)
-    public void onItemClick(int position) {
+    public void onItemClick(View v, int position) {
         if (mListener!=null)
             mListener.onItemListSelected(position);
-
+            //v.setBackgroundColor(getResources().getColor(R.color.colorAccent));
     }
 
     @Override
@@ -138,8 +142,10 @@ public class RecipeDetailFragment extends Fragment {
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
         outState.putIntArray("SCROLL_POSITION",  new int[]{ mScrollView.getScrollX(), mScrollView.getScrollY()});
+        Parcelable state = mListSteps.onSaveInstanceState();
+        outState.putParcelable("LIST_STATE",state);
+        super.onSaveInstanceState(outState);
     }
 
     /**
@@ -175,6 +181,7 @@ public class RecipeDetailFragment extends Fragment {
             ingredient_descr=sb.toString();
         }
         mIngredients_tv.setText(ingredient_descr);
+        mTitle_tv.setText(mRecipe.getName());
 
        /*
         ArrayList<HashMap<String, String>> arrayListIngr = new ArrayList<>();
@@ -203,15 +210,19 @@ public class RecipeDetailFragment extends Fragment {
         if (steps.size() > 0) {
             for (int i = 0; i < steps.size(); i++) {
                 HashMap<String, String> hashMap = new HashMap<>();//create a hashmap to store the data in key value pair
-                hashMap.put("step_short_descr",  Integer.toString(i+1)+". "+steps.get(i).getShortDescription());
+                String stepNumber="--";
+                if (i>0)
+                    stepNumber=Integer.toString(i)+". ";
+                hashMap.put("step_short_descr",  stepNumber+steps.get(i).getShortDescription());
                 ArrayListSteps.add(hashMap);//add the hashmap into arrayList
             }
 
             String[] from = {"step_short_descr"};
-            int[] to = {R.id.tv_step_short_descr};
+            int[]    to   = {R.id.tv_step_short_descr};
 
             SimpleAdapter si = new SimpleAdapter(getContext(), ArrayListSteps, R.layout.recipe_steps, from, to);
             mListSteps.setAdapter(si);
+            mListSteps.setSelection(-1);
         }
 
     }
@@ -224,6 +235,7 @@ public class RecipeDetailFragment extends Fragment {
         int[] position ;
         if (savedInstanceState!=null) {
             position = savedInstanceState.getIntArray("SCROLL_POSITION");
+            mListSteps.onRestoreInstanceState(savedInstanceState.getParcelable("LIST_STATE"));
         }
         else
             position =new int[]{0,0};
@@ -238,7 +250,6 @@ public class RecipeDetailFragment extends Fragment {
         }
 
     }
-
 
     public void setRecipeID(int ID) {
         mRecipeId = ID;

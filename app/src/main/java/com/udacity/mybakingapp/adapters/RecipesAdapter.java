@@ -1,9 +1,8 @@
 package com.udacity.mybakingapp.adapters;
 
-import android.content.Intent;
-import android.net.Uri;
-import android.support.v4.app.ActivityCompat;
-
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import com.squareup.picasso.Picasso;
 
 import android.content.Context;
@@ -15,9 +14,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.udacity.mybakingapp.R;
+import com.udacity.mybakingapp.data.ImageReplacer;
 import com.udacity.mybakingapp.model.Recipe;
-import com.udacity.mybakingapp.model.TrailerItem;
-import com.udacity.mybakingapp.utils.JsonUtils;
 
 
 public class RecipesAdapter extends RecyclerView.Adapter<RecipesAdapter.ViewHolder> {
@@ -29,9 +27,11 @@ public class RecipesAdapter extends RecyclerView.Adapter<RecipesAdapter.ViewHold
     private Recipe[] mRecipesData;
     private Context rcContext;
     private RecipeAdapterClickHandler mClickHandler;
+    static private ImageReplacer imageReplacer=null;
 
     public RecipesAdapter(RecipeAdapterClickHandler clickHandler) {
         mClickHandler=clickHandler;
+        imageReplacer=new ImageReplacer();
     }
 
 
@@ -70,9 +70,21 @@ public class RecipesAdapter extends RecyclerView.Adapter<RecipesAdapter.ViewHold
             if (content.length()>90) content=content.substring(0,90);
             holder.name_tv.setText(String.format("%s...", content));
             //Set the thumbnail image
-            String thumbnailURL = JsonUtils.makeThumbnailURL(mRecipesData[position].getImage());
-            if (holder.imgThumbnail!=null)
-                Picasso.with(rcContext).load(thumbnailURL).error(R.drawable.ic_error).into(holder.imgThumbnail);
+            if ((mRecipesData[position]!=null)  && (holder.imgThumbnail!=null)) {
+                int numSteps=mRecipesData[position].getSteps().size();
+                String imageUrl = mRecipesData[position].getImage();
+                int recipeId=mRecipesData[position].getId();
+                if (imageUrl.isEmpty() && (recipeId>0))
+                    imageUrl=imageReplacer.findThumbnailByRecipeId(recipeId);
+                if (!imageUrl.isEmpty()) {
+                    Picasso.with(rcContext).load(imageUrl).error(R.drawable.ic_error).into(holder.imgThumbnail);
+                }
+                else {
+                    Bitmap bmp=mRecipesData[position].getThumbnail();
+                    Drawable verticalImage = new BitmapDrawable(rcContext.getResources(), bmp);
+                    holder.imgThumbnail.setImageDrawable(verticalImage);
+                }
+            }
         }
     }
 

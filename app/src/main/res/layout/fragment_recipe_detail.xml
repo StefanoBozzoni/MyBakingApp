@@ -1,9 +1,9 @@
-<ScrollView
-    android:id="@+id/recipe_detail_scrollView"
+<ScrollView android:id="@+id/recipe_detail_scrollView"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -11,22 +11,39 @@
         android:orientation="vertical">
 
         <TextView
+            android:id="@+id/tv_recipe_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/card_background"
+            android:gravity="center"
+            android:textColor="@color/color_black"
+            android:textSize="@dimen/dimen24sp"
+            android:textStyle="bold"
+            tools:text="recipe name" />
+
+        <TextView
             android:id="@+id/lbl_ingredients"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:background="@android:color/holo_green_light"
+            android:backgroundTintMode="src_over"
             android:text="Ingredients"
             android:textAlignment="center"
-            android:textSize="20sp"
+            android:textColor="@color/color_black"
+            android:textSize="@dimen/dimen24sp"
             android:textStyle="bold"
+            android:layout_below="@+id/tv_recipe_title"
+            tools:backgroundTintMode="src_in"
             tools:text="Ingredients" />
 
         <TextView
             android:id="@+id/tv_ingredients_descr"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textSize="18sp"
             android:layout_below="@id/lbl_ingredients"
-            />
+            android:background="@color/card_background"
+            android:shadowRadius="4.0"
+            android:textSize="20sp" />
         <!--
         <ListView
             android:id="@+id/lv_Ingredients"
@@ -36,28 +53,31 @@
             android:layout_height="wrap_content">
         </ListView>
         -->
-
         <TextView
             android:id="@+id/lbl_steps"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_below="@+id/tv_ingredients_descr"
+            android:background="@android:color/holo_green_light"
             android:text="Recipe Steps"
             android:textAlignment="center"
-            android:textSize="20sp"
+            android:textColor="@color/color_black"
+            android:textSize="22sp"
             android:textStyle="bold"
-            tools:text="Recipe Steps"
-            android:layout_below="@+id/tv_ingredients_descr"/>
+            tools:backgroundTint="@android:color/holo_green_light"
+            tools:text="Recipe Steps" />
 
-        <ListView
-            android:id="@+id/lv_Steps"
-            android:layout_width="match_parent"
-            android:layout_height="500dp"
-            android:fadeScrollbars="false"
-            android:choiceMode="singleChoice"
-            android:listSelector="@color/colorAccent"
-            android:layout_below="@+id/lbl_steps"
-            tools:listitem="@layout/recipe_steps">
-        </ListView>
+             <ListView
+                 android:id="@+id/lv_Steps"
+                 android:layout_width="match_parent"
+                 android:layout_height="500dp"
+                 android:fadeScrollbars="false"
+                 android:choiceMode="singleChoice"
+                 android:listSelector="@drawable/genselector_rv"
+                 android:layout_below="@+id/lbl_steps"
+                 tools:listitem="@layout/recipe_steps">
+             </ListView>
+
 
     </RelativeLayout>
 </ScrollView>
