@@ -14,10 +14,10 @@
             android:id="@+id/tv_recipe_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/card_background"
+            android:background="@android:color/holo_green_light"
             android:gravity="center"
             android:textColor="@color/color_black"
-            android:textSize="@dimen/dimen24sp"
+            android:textSize="@dimen/size35sp"
             android:textStyle="bold"
             tools:text="recipe name" />
 
@@ -27,13 +27,12 @@
             android:layout_height="wrap_content"
             android:background="@android:color/holo_green_light"
             android:backgroundTintMode="src_over"
-            android:text="Ingredients"
+            android:text="@string/ingredients"
             android:textAlignment="center"
             android:textColor="@color/color_black"
             android:textSize="@dimen/dimen24sp"
             android:textStyle="bold"
             android:layout_below="@+id/tv_recipe_title"
-            tools:backgroundTintMode="src_in"
             tools:text="Ingredients" />
 
         <TextView
@@ -59,10 +58,10 @@
             android:layout_height="wrap_content"
             android:layout_below="@+id/tv_ingredients_descr"
             android:background="@android:color/holo_green_light"
-            android:text="Recipe Steps"
+            android:text="@string/recipe_steps"
             android:textAlignment="center"
             android:textColor="@color/color_black"
-            android:textSize="22sp"
+            android:textSize="@dimen/size22sp"
             android:textStyle="bold"
             tools:backgroundTint="@android:color/holo_green_light"
             tools:text="Recipe Steps" />

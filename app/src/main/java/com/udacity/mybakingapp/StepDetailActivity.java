@@ -6,20 +6,6 @@ import android.net.Uri;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.view.View;
-import android.widget.FrameLayout;
-import android.widget.Toast;
-
-import com.google.android.exoplayer2.DefaultLoadControl;
-import com.google.android.exoplayer2.DefaultRenderersFactory;
-import com.google.android.exoplayer2.ExoPlayerFactory;
-import com.google.android.exoplayer2.SimpleExoPlayer;
-import com.google.android.exoplayer2.source.ExtractorMediaSource;
-import com.google.android.exoplayer2.source.MediaSource;
-import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
-import com.google.android.exoplayer2.ui.PlayerView;
-import com.google.android.exoplayer2.upstream.DefaultHttpDataSourceFactory;
-import com.udacity.mybakingapp.utils.JsonUtils;
 
 
 public class StepDetailActivity extends AppCompatActivity
@@ -52,13 +38,5 @@ public class StepDetailActivity extends AppCompatActivity
             }
 
         }
-        /*
-        if ((mRecipeId != -1) && (savedInstanceState==null)) {
-            StepDetailFragment stepDetailFragment = new StepDetailFragment();
-            stepDetailFragment.setStepId(mRecipeId, mStepId);
-            FragmentManager fm = getSupportFragmentManager();
-            fm.beginTransaction().add(R.id.fragment_container,stepDetailFragment).commit();
-        }
-        */
     }
 }

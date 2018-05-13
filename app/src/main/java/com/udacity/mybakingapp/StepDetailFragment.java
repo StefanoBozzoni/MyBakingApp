@@ -230,6 +230,8 @@ public class StepDetailFragment extends Fragment {
     @Override
     public void onPause() {
         super.onPause();
+        SimpleExoPlayer player= (SimpleExoPlayer) mPlayerView.getPlayer();
+        if (player!=null) mStartPosition=player.getCurrentPosition();
         if (Util.SDK_INT <= 23) {
             releasePlayer();
         }
@@ -248,7 +250,7 @@ public class StepDetailFragment extends Fragment {
         super.onStart();
         SimpleExoPlayer player= (SimpleExoPlayer) mPlayerView.getPlayer();
 
-        if ((Util.SDK_INT > 23) || (player==null)) {
+        if (Util.SDK_INT > 23) {
             initializePlayer();
         }
 
