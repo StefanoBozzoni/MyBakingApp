@@ -11,6 +11,7 @@
     app:cardPreventCornerOverlap="false"
     app:cardUseCompatPadding="true"
     card_view:cardBackgroundColor="@color/card_background"
+    android:foreground="?android:attr/selectableItemBackground"
     android:layout_margin="16dp">
 
         <RelativeLayout

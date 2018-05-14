@@ -98,7 +98,7 @@ public class StepDetailFragment extends Fragment {
 
         View rootView;
         if ((getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE)
-           || getResources().getBoolean(R.bool.isTablet))
+           && !getResources().getBoolean(R.bool.isTablet))
             // Inflate the layout for this fragment
             rootView= inflater.inflate(R.layout.fragment_step_detail_land, container, false);
         else
@@ -157,7 +157,8 @@ public class StepDetailFragment extends Fragment {
     @SuppressLint("InlinedApi")
     private void hideSystemUi() {
 
-        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE){
+        if ((getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE)
+            && !getResources().getBoolean(R.bool.isTablet))   {
             mRootView.findViewById(R.id.tv_step_description).setVisibility(View.GONE);
 
             mPlayerView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LOW_PROFILE

@@ -72,6 +72,7 @@
                  android:layout_height="500dp"
                  android:fadeScrollbars="false"
                  android:choiceMode="singleChoice"
+                 android:foreground="?android:attr/selectableItemBackground"
                  android:listSelector="@drawable/genselector_rv"
                  android:layout_below="@+id/lbl_steps"
                  tools:listitem="@layout/recipe_steps">
