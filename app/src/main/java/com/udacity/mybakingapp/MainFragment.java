@@ -24,6 +24,10 @@ import com.udacity.mybakingapp.utils.JsonUtils;
 
 import java.net.URL;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.Unbinder;
+
 /**
  * Created by stefa on 05/05/2018.
  */
@@ -32,11 +36,12 @@ public class MainFragment extends Fragment
         implements LoaderManager.LoaderCallbacks<Recipe[]>,
                     RecipesAdapter.RecipeAdapterClickHandler {
 
+    @BindView(R.id.rv_recipes_main)  MyRecyclerView mRecyclerView;
+    private Unbinder unbinder;
 
     private static int ID_LOADER_RECIPES=100;
     Context mContext;
     Recipe[] mRecipesData;
-    RecyclerView mRecyclerView;
 
     @Override
     public void onClick(View v,int recipeIndex) {
@@ -59,10 +64,10 @@ public class MainFragment extends Fragment
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
         View rootView=inflater.inflate(R.layout.fragment_main,container,false);
+        unbinder=ButterKnife.bind(this,rootView);
         LoaderManager lm = getLoaderManager();
         lm.initLoader(ID_LOADER_RECIPES,null,this);
 
-        mRecyclerView = rootView.findViewById(R.id.rv_recipes_main);
         RecyclerView.LayoutManager layoutManager;
         if (getResources().getBoolean(R.bool.isTablet))
             layoutManager = new GridLayoutManager(mContext,2);
@@ -75,6 +80,12 @@ public class MainFragment extends Fragment
         mRecyclerView.setAdapter(ra);
 
         return rootView;
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        unbinder.unbind();
     }
 
     @SuppressLint("StaticFieldLeak")

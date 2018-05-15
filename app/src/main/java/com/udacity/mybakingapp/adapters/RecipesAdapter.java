@@ -17,6 +17,9 @@ import com.udacity.mybakingapp.R;
 import com.udacity.mybakingapp.data.ImageReplacer;
 import com.udacity.mybakingapp.model.Recipe;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+
 
 public class RecipesAdapter extends RecyclerView.Adapter<RecipesAdapter.ViewHolder> {
 
@@ -36,14 +39,12 @@ public class RecipesAdapter extends RecyclerView.Adapter<RecipesAdapter.ViewHold
 
 
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+        @BindView(R.id.tv_recipe)  TextView name_tv;
+        @BindView(R.id.img_recipe) ImageView imgThumbnail;
 
-        public final TextView  name_tv;
-        public final ImageView imgThumbnail;
-
-        public ViewHolder(View view) {
+        private ViewHolder(View view) {
             super(view);
-            name_tv      =  view.findViewById(R.id.tv_recipe);
-            imgThumbnail =  view.findViewById(R.id.img_recipe);
+            ButterKnife.bind(this,view);
             view.setOnClickListener(this);
         }
 

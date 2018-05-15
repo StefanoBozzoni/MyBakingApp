@@ -9,7 +9,7 @@
     android:layout_height="wrap_content"
     android:layout_margin="@dimen/margin8dp"
     card_view:cardBackgroundColor="@color/card_background"
-    card_view:cardCornerRadius="4dp"
+    card_view:cardCornerRadius="@dimen/corner_radius4dp"
     tools:context=".RecipeDetailActivity">
     <LinearLayout
         android:layout_width="match_parent"
@@ -18,14 +18,14 @@
     <ImageView
         android:id="@+id/img_recipe"
         android:layout_width="match_parent"
-        android:layout_height="178dp" />
+        android:layout_height="@dimen/img_recipe_height" />
 
     <TextView
         android:id="@+id/tv_recipe"
         android:layout_width="match_parent"
-        android:layout_height="30dp"
+        android:layout_height="@dimen/tv_recipe_height"
         android:textAlignment="center"
-        android:textSize="24sp"
+        android:textSize="@dimen/textSize24dp"
         android:textStyle="bold"
         tools:text="recipe name" />
     </LinearLayout>

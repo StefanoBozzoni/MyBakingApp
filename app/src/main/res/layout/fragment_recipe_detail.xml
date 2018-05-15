@@ -14,18 +14,18 @@
             android:id="@+id/tv_recipe_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@android:color/holo_green_light"
             android:gravity="center"
             android:textColor="@color/color_black"
             android:textSize="@dimen/size35sp"
             android:textStyle="bold"
+            android:background="@color/pastel_cyan"
             tools:text="recipe name" />
 
         <TextView
             android:id="@+id/lbl_ingredients"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@android:color/holo_green_light"
+            android:background="@color/pastel_cyan"
             android:backgroundTintMode="src_over"
             android:text="@string/ingredients"
             android:textAlignment="center"
@@ -57,16 +57,15 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@+id/tv_ingredients_descr"
-            android:background="@android:color/holo_green_light"
+            android:background="@color/pastel_cyan"
             android:text="@string/recipe_steps"
             android:textAlignment="center"
             android:textColor="@color/color_black"
             android:textSize="@dimen/size22sp"
             android:textStyle="bold"
-            tools:backgroundTint="@android:color/holo_green_light"
             tools:text="Recipe Steps" />
 
-             <ListView
+             <com.udacity.mybakingapp.MyRecyclerView
                  android:id="@+id/lv_Steps"
                  android:layout_width="match_parent"
                  android:layout_height="500dp"
@@ -75,8 +74,9 @@
                  android:foreground="?android:attr/selectableItemBackground"
                  android:listSelector="@drawable/genselector_rv"
                  android:layout_below="@+id/lbl_steps"
-                 tools:listitem="@layout/recipe_steps">
-             </ListView>
+                 android:tag="@string/recipe_steps"
+                 tools:listitem="@layout/rv_steps_layout">
+             </com.udacity.mybakingapp.MyRecyclerView>
 
 
     </RelativeLayout>

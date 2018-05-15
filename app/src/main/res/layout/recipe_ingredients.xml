@@ -8,9 +8,7 @@
         android:id="@+id/tv_ingredient_name"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textSize="24sp"
+        android:textSize="@dimen/textSize24dp"
         tools:text="Ingredient x" />
-
-
 
 </RelativeLayout>

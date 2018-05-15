@@ -2,25 +2,22 @@ package com.udacity.mybakingapp;
 
 import android.content.Context;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Adapter;
-import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.ScrollView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
-import android.widget.Toast;
 
+import com.udacity.mybakingapp.adapters.StepsAdapter;
 import com.udacity.mybakingapp.model.Ingredient;
 import com.udacity.mybakingapp.model.Recipe;
 import com.udacity.mybakingapp.model.Step;
@@ -33,6 +30,7 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnItemClick;
+import butterknife.Unbinder;
 
 
 /**
@@ -43,7 +41,7 @@ import butterknife.OnItemClick;
  * Use the {@link RecipeDetailFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class RecipeDetailFragment extends Fragment {
+public class RecipeDetailFragment extends Fragment implements StepsAdapter.StepsAdapterClickHandler {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String STEP_SHORT_DESCR="step_short_descr";
@@ -51,18 +49,26 @@ public class RecipeDetailFragment extends Fragment {
     private int mRecipeId;
     private Recipe mRecipe;
     private ListView mListIngredients;
-    private ListView mListSteps;
+
+    @BindView(R.id.lv_Steps)                 MyRecyclerView mListSteps;
+    @BindView(R.id.tv_ingredients_descr)     TextView       mIngredients_tv;
+    @BindView(R.id.tv_recipe_title)          TextView       mTitle_tv;
+    @BindView(R.id.recipe_detail_scrollView) ScrollView     mScrollView;
+    private Unbinder unbinder;
+
+    @Override
+    public void onClick(View v, int position) {
+        if (mListener!=null)
+            mListener.onItemListSelected(position);
+    }
 
     Context mContext;
     View mRootView;
-    ScrollView mScrollView;
 
     // TODO: Rename and change types of parameters
     private String mParam1;
 
     private OnFragmentInteractionListener mListener;
-    private TextView mIngredients_tv;
-    private TextView mTitle_tv;
 
     public RecipeDetailFragment() {
         // Required empty public constructor
@@ -100,25 +106,26 @@ public class RecipeDetailFragment extends Fragment {
         // Inflate the layout for this fragment
         Intent prova = getActivity().getIntent();
         mRootView=inflater.inflate(R.layout.fragment_recipe_detail, container, false);
-        ButterKnife.bind(this,mRootView);
-
-        //mListIngredients = (ListView) rootView.findViewById(R.id.lv_Ingredients);
-        mListSteps       = (ListView)   mRootView.findViewById(R.id.lv_Steps);
-        mIngredients_tv  = (TextView)   mRootView.findViewById(R.id.tv_ingredients_descr);
-        mTitle_tv        = (TextView)   mRootView.findViewById(R.id.tv_recipe_title);
-
-        mScrollView      = (ScrollView) mRootView.findViewById(R.id.recipe_detail_scrollView);
+        unbinder=ButterKnife.bind(this,mRootView);
 
         return mRootView;
     }
 
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        unbinder.unbind();
+    }
 
+/*
+    worked when was implemented with ListView
     @OnItemClick(R.id.lv_Steps)
     public void onItemClick(View v, int position) {
         if (mListener!=null)
             mListener.onItemListSelected(position);
             //v.setBackgroundColor(getResources().getColor(R.color.colorAccent));
     }
+    */
 
     @Override
     public void onAttach(Context context) {
@@ -142,8 +149,8 @@ public class RecipeDetailFragment extends Fragment {
     @Override
     public void onSaveInstanceState(Bundle outState) {
         outState.putIntArray("SCROLL_POSITION",  new int[]{ mScrollView.getScrollX(), mScrollView.getScrollY()});
-        Parcelable state = mListSteps.onSaveInstanceState();
-        outState.putParcelable("LIST_STATE",state);
+        //Parcelable state = mListSteps.onSaveInstanceState();
+        //outState.putParcelable("LIST_STATE",state);
         super.onSaveInstanceState(outState);
     }
 
@@ -183,31 +190,27 @@ public class RecipeDetailFragment extends Fragment {
         mIngredients_tv.setText(ingredient_descr);
         mTitle_tv.setText(mRecipe.getName());
 
-       /*
-        ArrayList<HashMap<String, String>> arrayListIngr = new ArrayList<>();
-        List<Ingredient> ingredients = new ArrayList<Ingredient>();
-        ingredients = mRecipe.getIngredients();
+        //List<Step> steps = new ArrayList<Step>();
+        //steps = mRecipe.getSteps();
+        List<Step> steps_list=mRecipe.getSteps();
+        Step[] steps= (steps_list).toArray(new Step[steps_list.size()]);
 
-        if (ingredients.size() > 0) {
-            for (int i = 0; i < ingredients.size(); i++) {
-                HashMap<String, String> hashMap = new HashMap<>();//create a hashmap to store the data in key value pair
-                hashMap.put("ingredient_name",ingredients.get(i).getIngredient());
-                arrayListIngr.add(hashMap);//add the hashmap into arrayList
-            }
+        if (steps.length>0) {
+            StepsAdapter sa=new StepsAdapter(this);
 
-            String[] from = {"ingredient_name"};
-            int[] to = {R.id.tv_ingredient_name};
-
-            SimpleAdapter si = new SimpleAdapter(getContext(), arrayListIngr, R.layout.recipe_ingredients, from, to);
-            mListIngredients.setAdapter(si);
+            RecyclerView.LayoutManager layoutManager;
+            layoutManager = new LinearLayoutManager(mContext,LinearLayoutManager.VERTICAL,false);
+            mListSteps.setLayoutManager(layoutManager);
+            mListSteps.setAdapter(sa);
+            sa.setStepsData(steps);
         }
-        */
-
-        ArrayList<HashMap<String, String>> ArrayListSteps = new ArrayList<>();
+        /* mListSteps was a ListView and worked perfectly but rubric asked for recyclerview
         List<Step> steps = new ArrayList<Step>();
         steps = mRecipe.getSteps();
 
         if (steps.size() > 0) {
+
+            ArrayList<HashMap<String, String>> ArrayListSteps = new ArrayList<>();
             for (int i = 0; i < steps.size(); i++) {
                 HashMap<String, String> hashMap = new HashMap<>();//create a hashmap to store the data in key value pair
                 String stepNumber="--";
@@ -220,10 +223,11 @@ public class RecipeDetailFragment extends Fragment {
             String[] from = {STEP_SHORT_DESCR};
             int[]    to   = {R.id.tv_step_short_descr};
 
-            SimpleAdapter si = new SimpleAdapter(getContext(), ArrayListSteps, R.layout.recipe_steps, from, to);
+            SimpleAdapter si = new SimpleAdapter(getContext(), ArrayListSteps, R.layout.rv_steps_layout, from, to);
             mListSteps.setAdapter(si);
             mListSteps.setSelection(-1);
         }
+        */
 
     }
 
@@ -235,7 +239,7 @@ public class RecipeDetailFragment extends Fragment {
         int[] position ;
         if (savedInstanceState!=null) {
             position = savedInstanceState.getIntArray("SCROLL_POSITION");
-            mListSteps.onRestoreInstanceState(savedInstanceState.getParcelable("LIST_STATE"));
+            //mListSteps.onRestoreInstanceState(savedInstanceState.getParcelable("LIST_STATE"));
         }
         else
             position =new int[]{0,0};
