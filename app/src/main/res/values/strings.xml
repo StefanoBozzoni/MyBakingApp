@@ -10,4 +10,5 @@
     <string name="recipe_steps">Recipe Steps</string>
     <string name="appwidget_text">Please choose a recipe from the app and add the widget again</string>
     <string name="add_widget">Add widget</string>
+    <string name="add_to_widget">add to widget</string>
 </resources>

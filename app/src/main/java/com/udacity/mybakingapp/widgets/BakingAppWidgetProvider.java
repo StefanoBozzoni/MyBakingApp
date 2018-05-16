@@ -1,4 +1,4 @@
-package com.udacity.mybakingapp.Widgets;
+package com.udacity.mybakingapp.widgets;
 
 import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
