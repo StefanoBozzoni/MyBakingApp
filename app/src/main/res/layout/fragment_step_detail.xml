@@ -16,6 +16,20 @@
         app:layout_constraintBottom_toTopOf="@+id/guideline"
         app:layout_constraintTop_toTopOf="parent"/>
 
+    <ImageView
+        android:id="@+id/stepsThumbnail"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_centerInParent="true"
+        android:scaleType="centerCrop"
+        app:layout_constraintBottom_toTopOf="@+id/guideline"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:visibility="visible"
+        />
+
+
     <com.google.android.exoplayer2.ui.PlayerView
         android:id="@+id/exoplayer"
         android:layout_width="0dp"
@@ -28,6 +42,7 @@
         app:layout_constraintTop_toTopOf="parent" >
 
     </com.google.android.exoplayer2.ui.PlayerView>
+
 
     <android.support.constraint.Guideline
         android:id="@+id/guideline"

@@ -10,7 +10,6 @@
     app:cardPreventCornerOverlap="false"
     app:cardUseCompatPadding="true"
     card_view:cardBackgroundColor="@color/card_background"
-    android:foreground="?android:attr/selectableItemBackground"
     android:layout_marginBottom="1dp"
     android:layout_marginLeft="@dimen/margin8dp"
     android:layout_marginRight="@dimen/margin8dp"

@@ -10,6 +10,7 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -23,6 +24,8 @@ import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
 import com.google.android.exoplayer2.ui.PlayerView;
 import com.google.android.exoplayer2.upstream.DefaultHttpDataSourceFactory;
 import com.google.android.exoplayer2.util.Util;
+import com.squareup.picasso.Picasso;
+import com.udacity.mybakingapp.data.ImageReplacer;
 import com.udacity.mybakingapp.model.Step;
 import com.udacity.mybakingapp.utils.JsonUtils;
 
@@ -180,11 +183,18 @@ public class StepDetailFragment extends Fragment {
     }
 
 
-
     private void initializePlayer() {
         if ((mRecipeId!=-1) && (mStepId>=0)) {
-            String videoUrl = JsonUtils.getRecipe(mRecipeId).getSteps().get(mStepId).getVideoURL();
+
+            Step step=JsonUtils.getRecipe(mRecipeId).getSteps().get(mStepId);
+            String videoUrl = step.getVideoURL();
+            String imageUrl = step.getThumbnailURL();
+            ImageView thumbnailView= (ImageView) mRootView.findViewById(R.id.stepsThumbnail);
+
             if (!videoUrl.isEmpty()) {
+
+                mPlayerView.setVisibility(View.VISIBLE);
+                thumbnailView.setVisibility(View.GONE);
                 mRootView.findViewById(R.id.tv_NovVideoAvailable).setVisibility(View.GONE);
                 SimpleExoPlayer player = ExoPlayerFactory.newSimpleInstance(
                         new DefaultRenderersFactory(mContext),
@@ -202,8 +212,18 @@ public class StepDetailFragment extends Fragment {
             }
             else
             {
-                mRootView.findViewById(R.id.exoplayer).setVisibility(View.GONE);
-                mRootView.findViewById(R.id.tv_NovVideoAvailable).setVisibility(View.VISIBLE);
+                if (!imageUrl.isEmpty()) {
+                    mPlayerView.setVisibility(View.GONE);
+                    thumbnailView.setVisibility(View.VISIBLE);
+                    mRootView.findViewById(R.id.tv_NovVideoAvailable).setVisibility(View.GONE);
+                    Picasso.with(mContext).load(imageUrl).error(R.drawable.ic_error).into(thumbnailView);
+                }
+                else {
+                    mPlayerView.setVisibility(View.INVISIBLE);
+                    thumbnailView.setVisibility(View.GONE);
+                    mRootView.findViewById(R.id.tv_NovVideoAvailable).setVisibility(View.VISIBLE);
+                }
+
             }
         }
     }
@@ -232,9 +252,9 @@ public class StepDetailFragment extends Fragment {
     public void onPause() {
         super.onPause();
         SimpleExoPlayer player= (SimpleExoPlayer) mPlayerView.getPlayer();
-        if (player!=null) mStartPosition=player.getCurrentPosition();
-        if (Util.SDK_INT <= 23) {
-            releasePlayer();
+        if (player!=null) {
+            mStartPosition=player.getCurrentPosition();
+            player.setPlayWhenReady(false); //pause the player
         }
     }
 
