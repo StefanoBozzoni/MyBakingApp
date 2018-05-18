@@ -45,14 +45,16 @@ public class StepDetailFragment extends Fragment {
     private Context mContext;
     private PlayerView mPlayerView;
 
-    private static final String ARG_PARAM1 = "param1";
-    private static final String SELECTED_POSITION="PLAYER_POSITION";
-    private static final String RECIPE_ID="RECIPE_ID";
-    private static final String STEP_ID="STEP_ID";
+    private static final String  ARG_PARAM1 = "param1";
+    private static final String  SELECTED_POSITION="PLAYER_POSITION";
+    private static final String  PLAYER_PLAYSTATE="PLAYER_PLAYSTATE";
+    private static final String  RECIPE_ID="RECIPE_ID";
+    private static final String  STEP_ID="STEP_ID";
 
     int mStepId=0;
     private int mRecipeId=-1;
     private long mStartPosition;
+    private boolean mPlayState;
 
     private OnFragmentInteractionListener mListener;
     private View mRootView;
@@ -93,10 +95,12 @@ public class StepDetailFragment extends Fragment {
                              ViewGroup container,
                              Bundle savedInstanceState) {
         mStartPosition=0;
+        mPlayState    =true;
         if (savedInstanceState!=null) {
             mStartPosition = savedInstanceState.getLong(SELECTED_POSITION);
             mRecipeId      = savedInstanceState.getInt(RECIPE_ID);
             mStepId        = savedInstanceState.getInt(STEP_ID);
+            mPlayState     = savedInstanceState.getBoolean(PLAYER_PLAYSTATE);
         }
 
         View rootView;
@@ -200,7 +204,7 @@ public class StepDetailFragment extends Fragment {
                         new DefaultRenderersFactory(mContext),
                         new DefaultTrackSelector(), new DefaultLoadControl());
                 mPlayerView.setPlayer(player);
-                player.setPlayWhenReady(true);
+                player.setPlayWhenReady(mPlayState);
                 player.seekTo(player.getCurrentWindowIndex(), mStartPosition);
                 Uri uri;
                 uri = Uri.parse(videoUrl);
@@ -254,7 +258,7 @@ public class StepDetailFragment extends Fragment {
         SimpleExoPlayer player= (SimpleExoPlayer) mPlayerView.getPlayer();
         if (player!=null) {
             mStartPosition=player.getCurrentPosition();
-            player.setPlayWhenReady(false); //pause the player
+            mPlayState    =player.getPlayWhenReady();
         }
     }
 
@@ -294,10 +298,15 @@ public class StepDetailFragment extends Fragment {
     @Override
     public void onSaveInstanceState(Bundle currentState) {
         SimpleExoPlayer player= (SimpleExoPlayer) mPlayerView.getPlayer();
-        long position=0;
-        if (player!=null)
-            position=player.getCurrentPosition();
-        currentState.putLong(SELECTED_POSITION, position);
+        long position         = 0;
+        boolean playState     = true;
+        if (player!=null) {
+            position    = player.getCurrentPosition();
+            playState   = player.getPlayWhenReady();
+        }
+        currentState.putLong(SELECTED_POSITION    , position);
+        currentState.putBoolean(PLAYER_PLAYSTATE  , playState);
+
         currentState.putLong(RECIPE_ID, mRecipeId);
         currentState.putLong(STEP_ID, mStepId);
 
